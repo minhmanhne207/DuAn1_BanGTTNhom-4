@@ -120,6 +120,7 @@ namespace PRL.View
             dtgviewHD.Columns[7].Visible = false;
             dtgviewHD.Columns[8].Name = "Mô tả voucher";
             dtgviewHD.Columns[9].Name = "Mã HD";
+          
             dtgviewHD.Rows.Clear();
             foreach (var i in _hoaDonServices.GetHoaDonChiTiets(txtsearch.Text))
             {
@@ -199,7 +200,7 @@ namespace PRL.View
                     if (cbbGiamGia.SelectedItem != null)
                     {
                         Voucher voucherChon = (Voucher)cbbGiamGia.SelectedItem;
-                        double giamGia = Convert.ToDouble(voucherChon.GiaTri * soLuong * giaBan);
+                        double giamGia = Convert.ToDouble(voucherChon.GiaTri);
                         txtTongTien.Text = tongTienBanDau.ToString();
 
                         double tongTienSauVoucher = tongTienBanDau - giamGia;
@@ -302,7 +303,7 @@ namespace PRL.View
                 {
 
                     MessageBox.Show("Thêm thất bại");
-                    MessageBox.Show("Hãy nhập đầy đủ các trường");
+                    MessageBox.Show("Hãy nhập đầy đủ thông tin");
                 }
 
 
@@ -461,7 +462,7 @@ namespace PRL.View
 
         private void txtTienSauVC_TextChanged(object sender, EventArgs e)
         {
-            // TinhTongTien();
+            TinhTongTien();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -550,44 +551,35 @@ namespace PRL.View
 
         private void btnThanhToan_Click(object sender, EventArgs e)
         {
-            //try
-            //{
-            // hoa don chi tiet
-            // khi thanh toán sez trừ số lượng vào db
+            string soHoaDon = txtSoSanPham.Text;
+            
+            decimal soTienCanThanhToan = Convert.ToDecimal(txtTienSauVC.Text);
 
-            if (txtSoSanPham.Text != string.Empty && cbbMaHD.Text != string.Empty)
+            // Xác nhận với người dùng trước khi tiến hành thanh toán
+                DialogResult confirm = MessageBox.Show(
+                $"Xác nhận thanh toán số tiền {soTienCanThanhToan:C} cho hóa đơn {soHoaDon} ?",
+                "Xác nhận thanh toán",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question
+            );
+
+            if (confirm == DialogResult.Yes)
             {
+                // Xử lý thanh toán
+                bool thanhToanThanhCong = XuLyThanhToan(soHoaDon, soTienCanThanhToan);
 
-
-
-                SanPham sanPham = new SanPham();
-
-                //sanPham.SoLuong = hDCT.SoLuong - Convert.ToInt32(txtSoSanPham.Text);
-                _hoaDonServices.UpdateSoLuongSanPham(_idWhenClick);
-                //_hoaDonServices.AddsHDCT(hDCT);
-
-                TinhTongTien();
-                LoadData(null);
-                LoadDataHDCT();
-
-                MessageBox.Show("Thêm thành công");
-
-
-
+                if (thanhToanThanhCong)
+                {
+                    MessageBox.Show("Thanh toán thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // Cập nhật trạng thái của hóa đơn chi tiết và giao diện
+                    CapNhatHoaDon(soHoaDon);
+                }
+                else
+                {
+                    MessageBox.Show("Thanh toán thất bại. Vui lòng thử lại.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            else
-            {
-                MessageBox.Show("Thêm thất bại");
-                MessageBox.Show("Hãy nhập đầy đủ các trường");
-            }
-
-
-            //}
-            //catch (Exception ex)
-            //{
-
-            //    MessageBox.Show("Thông báo :" + ex, "Thông báo ", MessageBoxButtons.OK);
-            //}
+          
         }
 
         private void dtgviewHD_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -657,6 +649,39 @@ namespace PRL.View
             {
                 MessageBox.Show("Có lỗi" + ex, "Thông báo", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
             }
+        }
+
+        private void label15_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label13_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dtgView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+        private bool XuLyThanhToan(string soHoaDon, decimal soTienCanThanhToan)
+        {
+            // Thêm mã xử lý thanh toán ở đây
+            // Ví dụ: Gọi API thanh toán, kiểm tra số dư, hoặc cập nhật cơ sở dữ liệu
+            return true; // Giả định thanh toán thành công
+        }
+
+        // Phương thức cập nhật trạng thái của hóa đơn
+        private void CapNhatHoaDon(string soHoaDon)
+        {
+            // Thêm mã cập nhật trạng thái hóa đơn ở đây
+            // Ví dụ: Cập nhật trạng thái trong cơ sở dữ liệu và giao diện
         }
     }
 }
